@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "nomeAluno": "Lucas Ferreira",
-  "matricula": "2026-002",
+  "matricula": "2026-001",
   "limiteDiario": 25.00,
   "saldoAtual": 100.00,
   "senha": "123"
@@ -23,3 +23,5 @@ PUT http://localhost:8080/cartoes/1/recarregar?valor=50.00&senha=123
 POST http://localhost:8080/cartoes/login?matricula=2026-002&senha=123
 ###
 POST http://localhost:8080/cartoes/login?matricula=2026-002&senha=123
+###
+PUT http://localhost:8080/cartoes/1/comprar?valor=10.00

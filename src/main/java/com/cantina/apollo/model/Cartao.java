@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -20,5 +21,8 @@ public class Cartao {
     private BigDecimal saldoAtual;
     private BigDecimal limiteDiario;
     private String senha;
+    private  BigDecimal totalGastoHoje = BigDecimal.ZERO;
+    private LocalDate dataUltimaCompra = LocalDate.now();
+
 
 }
