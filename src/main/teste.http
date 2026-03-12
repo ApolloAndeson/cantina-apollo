@@ -1,0 +1,21 @@
+POST http://localhost:8080/cartoes
+Content-Type: application/json
+
+{
+  "nomeAluno": "Lorena Maria",
+  "matricula": "2026-002",
+  "limiteDiario": 25.00,
+  "saldoAtual": 100.00,
+  "senha": "321"
+}
+###
+GET http://localhost:8080/cartoes
+###
+GET http://localhost:8080/cartoes/2
+###
+PUT http://localhost:8080/cartoes/2/comprar?valor=15.00
+###
+PUT http://localhost:8080/cartoes/1/recarregar?valor=50.00&senha=456
+###
+###
+PUT http://localhost:8080/cartoes/1/recarregar?valor=50.00&senha=123
