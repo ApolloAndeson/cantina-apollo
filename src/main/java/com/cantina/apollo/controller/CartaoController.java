@@ -51,5 +51,21 @@
             } else {
                 throw new RuntimeException("Senha incorreta! Tente novamente.");
             }
+        }
+
+        @PostMapping("/login")
+        public Cartao login(@RequestParam String matricula, @RequestParam String senha) {
+            Optional<Cartao> busca = repository.findByMatricula(matricula);
+            if(busca.isEmpty()) {
+                throw new RuntimeException("Matrícula não encontrada!");
             }
+            Cartao cartao = busca.get();
+            if(cartao.getSenha().equals(senha)) {
+                return cartao;
+
+            } else {
+                throw new RuntimeException("Senha incorreta!");
+            }
+
+        }
     }
