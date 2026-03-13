@@ -2,11 +2,11 @@ POST http://localhost:8080/cartoes
 Content-Type: application/json
 
 {
-  "nomeAluno": "Lucas Ferreira",
-  "matricula": "2026-001",
+  "nomeAluno": "Lorena Maria",
+  "matricula": "2026-002",
   "limiteDiario": 25.00,
   "saldoAtual": 100.00,
-  "senha": "123"
+  "senha": "321"
 }
 ###
 GET http://localhost:8080/cartoes
