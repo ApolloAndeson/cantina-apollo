@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -73,7 +74,10 @@ public class CartaoController {
     }
 
     @PostMapping("/login")
-    public Cartao login(@RequestParam String matricula, @RequestParam String senha) {
+    public Cartao login(@RequestBody Map<String, String> dados) {
+        String matricula = dados.get("matricula");
+        String senha = dados.get("senha");
+
         Optional<Cartao> busca = repository.findByMatricula(matricula);
         if (busca.isEmpty()) {
             throw new RuntimeException("Matrícula não encontrada!");
