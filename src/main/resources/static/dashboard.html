@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Crédito Cantina</title>
+    <style>
+        /* Estilo Dark Mode Coerente */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .dashboard-card {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            width: 380px;
+            text-align: center;
+            border-top: 6px solid #3b82f6; /* Detalhe azul no topo */
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
+        .aluno-nome {
+            color: #3b82f6;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .saldo-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .label {
+            color: #888;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .valor-saldo {
+            font-size: 42px;
+            font-weight: bold;
+            color: #10b981; /* Verde esmeralda para o dinheiro */
+            margin: 10px 0;
+        }
+
+        .limite-diario {
+            font-size: 20px;
+            color: #f0f0f0;
+            margin-top: 5px;
+        }
+
+        .btn-sair {
+            background-color: #333;
+            color: #ff4d4d;
+            border: 1px solid #444;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: all 0.3s;
+        }
+
+        .btn-sair:hover {
+            background-color: #ff4d4d;
+            color: white;
+            border-color: #ff4d4d;
+        }
+    </style>
+</head>
+<body onload="carregarInformacoes()">
+
+<div class="dashboard-card">
+    <h1>Bem-vindo!</h1>
+    <span id="nomeAluno" class="aluno-nome">Carregando...</span>
+
+    <div class="saldo-section">
+        <div class="label">Saldo Disponível</div>
+        <div class="valor-saldo">R$ <span id="saldoValor">0,00</span></div>
+    </div>
+
+    <div class="label">Limite Diário</div>
+    <div class="limite-diario">R$ <span id="limiteValor">0,00</span></div>
+
+    <button class="btn-sair" onclick="fazerLogout()">Sair do Sistema</button>
+</div>
+
+<script>
+    function carregarInformacoes() {
+        // Pega a matrícula que salvamos no login
+        const matricula = localStorage.getItem("matriculaLogada");
+
+        // Se não tiver matrícula, volta pro login (segurança básica)
+        if (!matricula) {
+            window.location.href = "index.html";
+            return;
+        }
+
+        // Busca os dados do cartão no seu Java
+        // Importante: Seu Java deve ter o GetMapping("/{matricula}")
+        fetch('/cartoes/' + matricula)
+            .then(response => {
+                if (!response.ok) throw new Error("Erro ao buscar dados");
+                return response.json();
+            })
+            .then(cartao => {
+                // Preenche os campos com os dados do banco
+                document.getElementById("nomeAluno").innerText = cartao.nomeAluno;
+                document.getElementById("saldoValor").innerText = cartao.saldo.toFixed(2).replace('.', ',');
+                document.getElementById("limiteValor").innerText = cartao.limiteDiario.toFixed(2).replace('.', ',');
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                alert("Não foi possível carregar os dados do cartão.");
+            });
+    }
+
+    function fazerLogout() {
+        localStorage.removeItem("matriculaLogada");
+        window.location.href = "index.html";
+    }
+</script>
+</body>
+</html>

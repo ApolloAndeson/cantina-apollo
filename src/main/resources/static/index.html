@@ -8,7 +8,7 @@
         /* Estilo Dark Mode Moderno */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212; /* Fundo principal escuro */
+            background-color: #121212;
             color: #f0f0f0;
             display: flex;
             flex-direction: column;
@@ -19,7 +19,7 @@
         }
 
         .login-container {
-            background-color: #1e1e1e; /* Fundo do formulário */
+            background-color: #1e1e1e;
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
@@ -27,7 +27,7 @@
         }
 
         h1 {
-            color: #3b82f6; /* Azul vibrante */
+            color: #3b82f6;
             margin-bottom: 30px;
             font-size: 28px;
         }
@@ -72,7 +72,7 @@
         }
 
         button:active {
-            transform: scale(0.98); /* Efeito de clique */
+            transform: scale(0.98);
         }
     </style>
 </head>
@@ -80,36 +80,36 @@
 
 <div class="login-container">
     <h1>Credito Cantina</h1>
-
     <input type="text" id="matriculaInput" placeholder="Matrícula">
     <br>
     <input type="password" id="senhaInput" placeholder="Senha">
     <br>
-
     <button onclick="fazerLogin()">Entrar</button>
 </div>
 
 <script>
     function fazerLogin() {
-        // Captura os valores digitados
-        let matricula = document.getElementById("matriculaInput").value;
-        let senha = document.getElementById("senhaInput").value;
+        let matriculaDigitada = document.getElementById("matriculaInput").value;
+        let senhaDigitada = document.getElementById("senhaInput").value;
 
-        // Envia os dados para o @PostMapping("/login") no Java
         fetch('/cartoes/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                matricula: matricula,
-                senha: senha
+                matricula: matriculaDigitada,
+                senha: senhaDigitada
             })
         })
             .then(response => {
                 if (response.ok) {
-                    alert("Login realizado com sucesso! 🚀");
-                    // Futuro: window.location.href = "/dashboard.html";
+                    // --- O SEGREDO ESTÁ AQUI ---
+                    // 1. Salva a matrícula na memória do navegador
+                    localStorage.setItem("matriculaLogada", matriculaDigitada);
+
+                    // 2. Redireciona para a página do Dashboard
+                    window.location.href = "dashboard.html";
                 } else {
                     alert("Ops! Matrícula ou senha incorretos.");
                 }
