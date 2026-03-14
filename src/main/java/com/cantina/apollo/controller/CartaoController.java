@@ -5,6 +5,7 @@ import com.cantina.apollo.repository.CartaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -89,6 +90,18 @@ public class CartaoController {
         } else {
             throw new RuntimeException("Senha incorreta!");
         }
+
+    }
+    @GetMapping("/perfil/{matricula}")
+    public Cartao buscarPorMatricula(@PathVariable String matricula) {
+        Optional<Cartao> busca = repository.findByMatricula(matricula);
+
+        if(busca.isEmpty()) {
+            throw new RuntimeException("Matricula não existente");
+        }
+        Cartao cartao = busca.get();
+
+        return cartao;
 
     }
 }

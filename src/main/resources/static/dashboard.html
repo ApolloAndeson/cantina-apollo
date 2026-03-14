@@ -24,7 +24,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             width: 380px;
             text-align: center;
-            border-top: 6px solid #3b82f6; /* Detalhe azul no topo */
+            border-top: 6px solid #3b82f6;
         }
 
         h1 {
@@ -58,7 +58,7 @@
         .valor-saldo {
             font-size: 42px;
             font-weight: bold;
-            color: #10b981; /* Verde esmeralda para o dinheiro */
+            color: #10b981; /* Verde esmeralda */
             margin: 10px 0;
         }
 
@@ -106,35 +106,39 @@
 
 <script>
     function carregarInformacoes() {
-        // Pega a matrícula que salvamos no login
+        // Recupera a matrícula que foi guardada no momento do login
         const matricula = localStorage.getItem("matriculaLogada");
 
-        // Se não tiver matrícula, volta pro login (segurança básica)
+        // Se não houver matrícula, o usuário não logou. Volta para a tela inicial.
         if (!matricula) {
             window.location.href = "index.html";
             return;
         }
 
-        // Busca os dados do cartão no seu Java
-        // Importante: Seu Java deve ter o GetMapping("/{matricula}")
-        fetch('/cartoes/' + matricula)
+        // Faz a requisição para a rota correta do Java que criamos: /cartoes/perfil/{matricula}
+        fetch('/cartoes/perfil/' + matricula)
             .then(response => {
-                if (!response.ok) throw new Error("Erro ao buscar dados");
+                if (!response.ok) throw new Error("Erro na resposta do servidor");
                 return response.json();
             })
             .then(cartao => {
-                // Preenche os campos com os dados do banco
+                // Preenche os dados na tela usando os nomes exatos do seu modelo Java
                 document.getElementById("nomeAluno").innerText = cartao.nomeAluno;
-                document.getElementById("saldoValor").innerText = cartao.saldo.toFixed(2).replace('.', ',');
+
+                // Correção aqui: usando saldoAtual conforme seu código Java
+                document.getElementById("saldoValor").innerText = cartao.saldoAtual.toFixed(2).replace('.', ',');
+
+                // Verifique se no Java é limiteDiario (maiúsculo/minúsculo deve ser igual)
                 document.getElementById("limiteValor").innerText = cartao.limiteDiario.toFixed(2).replace('.', ',');
             })
             .catch(error => {
-                console.error("Erro:", error);
-                alert("Não foi possível carregar os dados do cartão.");
+                console.error("Erro detalhado:", error);
+                alert("Não foi possível carregar os dados. Verifique se o servidor Java está rodando.");
             });
     }
 
     function fazerLogout() {
+        // Limpa a memória do navegador e volta pro login
         localStorage.removeItem("matriculaLogada");
         window.location.href = "index.html";
     }
