@@ -5,53 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Crédito Cantina</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
 
-        .dashboard-card {
-            background-color: #1e1e1e;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-            width: 380px;
-            text-align: center;
-            border-top: 6px solid #3b82f6;
-        }
+        .dashboard-card { background-color: #1e1e1e; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); width: 380px; text-align: center; border-top: 6px solid #3b82f6; }
 
         h1 { font-size: 24px; margin-bottom: 5px; color: #ffffff; }
-
         .aluno-nome { color: #3b82f6; font-weight: bold; display: block; margin-bottom: 30px; font-size: 18px; }
-
         .saldo-section { background-color: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-
         .label { color: #888; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-
         .valor-saldo { font-size: 42px; font-weight: bold; color: #10b981; margin: 10px 0; }
-
         .limite-diario { font-size: 20px; color: #f0f0f0; margin-top: 5px; }
 
-        .btn-recarga {
-            background-color: #10b981;
-            color: white; border: none; padding: 12px 20px;
-            border-radius: 8px; cursor: pointer; width: 100%;
-            font-weight: bold; margin-bottom: 10px; transition: 0.3s;
-        }
+        .btn-recarga { background-color: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 10px; transition: 0.3s; }
         .btn-recarga:hover { background-color: #059669; }
-
-        .btn-sair {
-            background-color: #333; color: #ff4d4d; border: 1px solid #444;
-            padding: 10px 25px; border-radius: 8px; cursor: pointer;
-            font-weight: bold; margin-top: 10px; width: 100%;
-        }
+        .btn-sair { background-color: #333; color: #ff4d4d; border: 1px solid #444; padding: 10px 25px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
         .btn-sair:hover { background-color: #ff4d4d; color: white; }
+
+        /* Estilo do Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #1e1e1e; padding: 30px; border-radius: 16px; width: 300px; text-align: center; border: 1px solid #3b82f6; }
+        .modal-content input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: white; }
+        .modal-content button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-confirmar { background: #10b981; color: white; }
+        .btn-cancelar { background: #444; color: #ccc; }
     </style>
 </head>
 <body onload="carregarInformacoes()">
@@ -59,29 +35,32 @@
 <div class="dashboard-card">
     <h1>Bem-vindo!</h1>
     <span id="nomeAluno" class="aluno-nome">Carregando...</span>
-
     <div class="saldo-section">
         <div class="label">Saldo Disponível</div>
         <div class="valor-saldo">R$ <span id="saldoValor">0,00</span></div>
     </div>
-
     <div class="label">Limite Diário</div>
     <div class="limite-diario">R$ <span id="limiteValor">0,00</span></div>
-
-    <button class="btn-recarga" onclick="abrirRecarga()">Recarregar Saldo</button>
+    <button class="btn-recarga" onclick="abrirModal()">Recarregar Saldo</button>
     <button class="btn-sair" onclick="fazerLogout()">Sair do Sistema</button>
 </div>
 
+<div id="modalRecarga" class="modal">
+    <div class="modal-content">
+        <h2 style="color:white; margin-top:0;">Recarregar Saldo</h2>
+        <input type="number" id="inputValor" placeholder="Valor em R$">
+        <input type="password" id="inputSenha" placeholder="Sua senha">
+        <button class="btn-confirmar" onclick="confirmarRecarga()">Confirmar Recarga</button>
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+    </div>
+</div>
+
 <script>
-    let idCartaoAtual = null; // Variável para armazenar o ID recebido do Java
+    let idCartaoAtual = null;
 
     function carregarInformacoes() {
         const matricula = localStorage.getItem("matriculaLogada");
-
-        if (!matricula) {
-            window.location.href = "index.html";
-            return;
-        }
+        if (!matricula) { window.location.href = "index.html"; return; }
 
         fetch('/cartoes/perfil/' + matricula)
             .then(response => response.json())
@@ -89,8 +68,6 @@
                 document.getElementById("nomeAluno").innerText = cartao.nomeAluno;
                 document.getElementById("saldoValor").innerText = cartao.saldoAtual.toFixed(2).replace('.', ',');
                 document.getElementById("limiteValor").innerText = cartao.limiteDiario.toFixed(2).replace('.', ',');
-
-                // Salva o ID para usar na recarga
                 idCartaoAtual = cartao.id;
             })
             .catch(error => {
@@ -99,25 +76,33 @@
             });
     }
 
-    function abrirRecarga() {
-        let valor = prompt("Digite o valor da recarga:");
-        let senha = prompt("Confirme sua senha:");
+    function abrirModal() { document.getElementById("modalRecarga").style.display = "flex"; }
+    function fecharModal() { document.getElementById("modalRecarga").style.display = "none"; }
 
-        if (valor && senha) {
-            fetch('/cartoes/' + idCartaoAtual + '/recarregar', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ valor: valor, senha: senha })
+    function confirmarRecarga() {
+        let valor = document.getElementById("inputValor").value;
+        let senha = document.getElementById("inputSenha").value;
+
+        if (!valor || valor <= 0) { alert("Digite um valor válido!"); return; }
+        if (!senha) { alert("Digite sua senha!"); return; }
+
+        fetch('/cartoes/' + idCartaoAtual + '/recarregar', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ valor: valor, senha: senha })
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("Recarga realizada com sucesso!");
+                    document.getElementById("inputValor").value = "";
+                    document.getElementById("inputSenha").value = "";
+                    fecharModal();
+                    carregarInformacoes();
+                } else {
+                    alert("Erro: Senha incorreta ou dados inválidos.");
+                }
             })
-                .then(res => {
-                    if (res.ok) {
-                        alert("Recarga feita com sucesso!");
-                        carregarInformacoes(); // Atualiza a tela após a recarga
-                    } else {
-                        alert("Erro na recarga! Verifique a senha.");
-                    }
-                });
-        }
+            .catch(err => console.error("Erro:", err));
     }
 
     function fazerLogout() {
