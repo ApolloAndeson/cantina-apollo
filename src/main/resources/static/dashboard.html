@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Crédito Cantina</title>
     <style>
-        /* Estilo Dark Mode Coerente */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #121212;
@@ -27,64 +26,32 @@
             border-top: 6px solid #3b82f6;
         }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-            color: #ffffff;
-        }
+        h1 { font-size: 24px; margin-bottom: 5px; color: #ffffff; }
 
-        .aluno-nome {
-            color: #3b82f6;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 30px;
-            font-size: 18px;
-        }
+        .aluno-nome { color: #3b82f6; font-weight: bold; display: block; margin-bottom: 30px; font-size: 18px; }
 
-        .saldo-section {
-            background-color: #2a2a2a;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
+        .saldo-section { background-color: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
 
-        .label {
-            color: #888;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .label { color: #888; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
 
-        .valor-saldo {
-            font-size: 42px;
-            font-weight: bold;
-            color: #10b981; /* Verde esmeralda */
-            margin: 10px 0;
-        }
+        .valor-saldo { font-size: 42px; font-weight: bold; color: #10b981; margin: 10px 0; }
 
-        .limite-diario {
-            font-size: 20px;
-            color: #f0f0f0;
-            margin-top: 5px;
+        .limite-diario { font-size: 20px; color: #f0f0f0; margin-top: 5px; }
+
+        .btn-recarga {
+            background-color: #10b981;
+            color: white; border: none; padding: 12px 20px;
+            border-radius: 8px; cursor: pointer; width: 100%;
+            font-weight: bold; margin-bottom: 10px; transition: 0.3s;
         }
+        .btn-recarga:hover { background-color: #059669; }
 
         .btn-sair {
-            background-color: #333;
-            color: #ff4d4d;
-            border: 1px solid #444;
-            padding: 10px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 25px;
-            transition: all 0.3s;
+            background-color: #333; color: #ff4d4d; border: 1px solid #444;
+            padding: 10px 25px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; margin-top: 10px; width: 100%;
         }
-
-        .btn-sair:hover {
-            background-color: #ff4d4d;
-            color: white;
-            border-color: #ff4d4d;
-        }
+        .btn-sair:hover { background-color: #ff4d4d; color: white; }
     </style>
 </head>
 <body onload="carregarInformacoes()">
@@ -101,44 +68,59 @@
     <div class="label">Limite Diário</div>
     <div class="limite-diario">R$ <span id="limiteValor">0,00</span></div>
 
+    <button class="btn-recarga" onclick="abrirRecarga()">Recarregar Saldo</button>
     <button class="btn-sair" onclick="fazerLogout()">Sair do Sistema</button>
 </div>
 
 <script>
+    let idCartaoAtual = null; // Variável para armazenar o ID recebido do Java
+
     function carregarInformacoes() {
-        // Recupera a matrícula que foi guardada no momento do login
         const matricula = localStorage.getItem("matriculaLogada");
 
-        // Se não houver matrícula, o usuário não logou. Volta para a tela inicial.
         if (!matricula) {
             window.location.href = "index.html";
             return;
         }
 
-        // Faz a requisição para a rota correta do Java que criamos: /cartoes/perfil/{matricula}
         fetch('/cartoes/perfil/' + matricula)
-            .then(response => {
-                if (!response.ok) throw new Error("Erro na resposta do servidor");
-                return response.json();
-            })
+            .then(response => response.json())
             .then(cartao => {
-                // Preenche os dados na tela usando os nomes exatos do seu modelo Java
                 document.getElementById("nomeAluno").innerText = cartao.nomeAluno;
-
-                // Correção aqui: usando saldoAtual conforme seu código Java
                 document.getElementById("saldoValor").innerText = cartao.saldoAtual.toFixed(2).replace('.', ',');
-
-                // Verifique se no Java é limiteDiario (maiúsculo/minúsculo deve ser igual)
                 document.getElementById("limiteValor").innerText = cartao.limiteDiario.toFixed(2).replace('.', ',');
+
+                // Salva o ID para usar na recarga
+                idCartaoAtual = cartao.id;
             })
             .catch(error => {
-                console.error("Erro detalhado:", error);
-                alert("Não foi possível carregar os dados. Verifique se o servidor Java está rodando.");
+                console.error("Erro:", error);
+                alert("Não foi possível carregar os dados.");
             });
     }
 
+    function abrirRecarga() {
+        let valor = prompt("Digite o valor da recarga:");
+        let senha = prompt("Confirme sua senha:");
+
+        if (valor && senha) {
+            fetch('/cartoes/' + idCartaoAtual + '/recarregar', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ valor: valor, senha: senha })
+            })
+                .then(res => {
+                    if (res.ok) {
+                        alert("Recarga feita com sucesso!");
+                        carregarInformacoes(); // Atualiza a tela após a recarga
+                    } else {
+                        alert("Erro na recarga! Verifique a senha.");
+                    }
+                });
+        }
+    }
+
     function fazerLogout() {
-        // Limpa a memória do navegador e volta pro login
         localStorage.removeItem("matriculaLogada");
         window.location.href = "index.html";
     }

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @RestController
 @RequestMapping("/cartoes")
 public class CartaoController {
@@ -64,7 +66,10 @@ public class CartaoController {
     }
 
     @PutMapping("/{id}/recarregar")
-    public Cartao recargaCartao(@PathVariable Long id, @RequestParam BigDecimal valor, @RequestParam String senha) {
+    public Cartao recargaCartao(@PathVariable Long id, @RequestBody Map<String, Object> dados) {
+        BigDecimal valor = new BigDecimal(dados.get("valor").toString());
+        String senha = (String) dados.get("senha");
+
         Cartao cartao = repository.findById(id).get();
         if (cartao.getSenha().equals(senha)) {
             cartao.setSaldoAtual(cartao.getSaldoAtual().add(valor));
